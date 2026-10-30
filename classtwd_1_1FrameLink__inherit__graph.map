@@ -1,0 +1,7 @@
+<map id="twd::FrameLink" name="twd::FrameLink">
+<area shape="rect" id="Node000001" title="Raw Ethernet access to the uplink network (bridge mode)." alt="" coords="144,5,265,33"/>
+<area shape="rect" id="Node000002" href="$classtwd_1_1Esp32WifiFrameLink.html" title="Raw Ethernet access to the WiFi network through the ESP32&#39;s station." alt="" coords="5,81,191,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,42,118,83,116,78,171,43"/>
+<area shape="rect" id="Node000003" href="$classtwd_1_1Rp2040WifiFrameLink.html" title="Raw Ethernet access to the WiFi network through the CYW43 chip of the Pico W / Pico 2 W." alt="" coords="215,81,410,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="237,40,296,81,291,80,236,45"/>
+</map>

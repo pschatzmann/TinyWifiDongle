@@ -1,0 +1,10 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classtwd_1_1FrameLink.html" title="Raw Ethernet access to the uplink network (bridge mode)." alt="" coords="5,5,127,33"/>
+<area shape="rect" id="Node000001" href="$classtwd_1_1Esp32WifiFrameLink.html" title="Raw Ethernet access to the WiFi network through the ESP32&#39;s station." alt="" coords="180,5,365,33"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="141,17,182,18,177,20,142,22"/>
+<area shape="rect" id="Node000003" href="$classtwd_1_1Rp2040WifiFrameLink.html" title="Raw Ethernet access to the WiFi network through the CYW43 chip of the Pico W / Pico 2 W." alt="" coords="175,57,370,85"/>
+<area shape="poly" id="edge2_Node000000_Node000003" title=" " alt="" coords="139,35,217,56,212,57,138,40"/>
+<area shape="rect" id="Node000002" href="$classtwd_1_1Uplink.html" title="The connection to the WiFi network the traffic is bridged to." alt="" coords="18,57,114,85"/>
+<area shape="poly" id="edge3_Node000002_Node000001" title=" " alt="" coords="128,53,212,34,217,33,129,58"/>
+<area shape="poly" id="edge4_Node000002_Node000003" title=" " alt="" coords="129,69,177,71,172,71,129,74"/>
+</map>

@@ -1,0 +1,37 @@
+<map id="src/core/Logger.h" name="src/core/Logger.h">
+<area shape="rect" id="Node000001" title="Printf&#45;style logging through the global TWD_LOGGER object." alt="" coords="457,5,588,33"/>
+<area shape="rect" id="Node000002" href="$TinyWifiDongleSetup_8h.html" title="Lets the user enter the WiFi credentials in a browser instead of hard&#45;coding them." alt="" coords="5,182,198,210"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="458,39,333,83,216,137,126,184,123,180,213,132,331,79,462,36"/>
+<area shape="rect" id="Node000003" href="$Interfaces_8h.html" title="Portable abstractions the dongle is built from." alt="" coords="574,90,728,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="556,39,633,89,628,89,556,44"/>
+<area shape="rect" id="Node000014" href="$Esp32UsbTaskPin_8h.html" title=" " alt="" coords="1021,81,1209,126"/>
+<area shape="poly" id="edge17_Node000001_Node000014" title=" " alt="" coords="604,29,1023,88,1018,90,604,34"/>
+<area shape="rect" id="Node000015" href="$SetupPortal_8h.html" title=" " alt="" coords="344,90,515,117"/>
+<area shape="poly" id="edge19_Node000001_Node000015" title=" " alt="" coords="498,42,446,91,442,87,494,45"/>
+<area shape="rect" id="Node000004" href="$L2Bridge_8h.html" title=" " alt="" coords="678,182,824,210"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="677,125,739,182,734,182,675,130"/>
+<area shape="rect" id="Node000010" href="$Esp32UsbNcm_8h.html" title=" " alt="" coords="847,174,1036,218"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="708,120,874,173,869,173,707,125"/>
+<area shape="rect" id="Node000011" href="$Esp32WifiFrameLink_8h.html" title=" " alt="" coords="1059,174,1248,218"/>
+<area shape="poly" id="edge11_Node000003_Node000011" title=" " alt="" coords="743,117,1049,171,1061,176,1056,176,1048,176,743,123"/>
+<area shape="rect" id="Node000012" href="$Rp2040UsbNcm_8h.html" title=" " alt="" coords="222,174,426,218"/>
+<area shape="poly" id="edge13_Node000003_Node000012" title=" " alt="" coords="586,123,404,176,402,171,591,120"/>
+<area shape="rect" id="Node000013" href="$Rp2040WifiFrameLink_8h.html" title=" " alt="" coords="450,174,654,218"/>
+<area shape="poly" id="edge15_Node000003_Node000013" title=" " alt="" coords="628,126,577,175,574,171,623,129"/>
+<area shape="rect" id="Node000005" href="$Esp32Dongle_8h.html" title=" " alt="" coords="936,266,1158,294"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="813,212,1002,266,997,266,813,217"/>
+<area shape="rect" id="Node000008" href="$Rp2040Dongle_8h.html" title=" " alt="" coords="434,266,671,294"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="707,215,585,268,583,263,702,217"/>
+<area shape="rect" id="Node000006" href="$TinyWifiDonglePortEsp32_8h.html" title=" " alt="" coords="957,342,1137,387"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1049,308,1049,343,1045,340,1045,312"/>
+<area shape="rect" id="Node000007" href="$TinyWifiDongle_8h.html" title="Header&#45;only USB WiFi dongle for Arduino." alt="" coords="969,435,1124,462"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1049,401,1049,436,1045,432,1045,404"/>
+<area shape="rect" id="Node000009" href="$TinyWifiDonglePortRp2040_8h.html" title=" " alt="" coords="462,342,642,387"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="554,308,554,343,550,340,550,312"/>
+<area shape="poly" id="edge10_Node000010_Node000005" title=" " alt="" coords="982,225,1032,266,1027,265,980,230"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="1116,227,1065,268,1063,263,1111,229"/>
+<area shape="poly" id="edge14_Node000012_Node000008" title=" " alt="" coords="399,221,518,265,513,266,399,227"/>
+<area shape="poly" id="edge16_Node000013_Node000008" title=" " alt="" coords="554,232,554,267,550,264,551,236"/>
+<area shape="poly" id="edge18_Node000014_Node000005" title=" " alt="" coords="1214,130,1241,148,1262,172,1271,196,1269,208,1262,220,1242,236,1210,249,1131,268,1130,263,1208,244,1239,231,1258,217,1264,206,1266,197,1258,175,1238,152,1213,136"/>
+<area shape="poly" id="edge20_Node000015_Node000002" title=" " alt="" coords="366,124,150,184,148,179,368,119"/>
+</map>

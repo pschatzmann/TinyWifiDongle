@@ -1,0 +1,13 @@
+<map id="src/core/L2Bridge.h" name="src/core/L2Bridge.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="170,5,315,33"/>
+<area shape="rect" id="Node000002" href="$Esp32Dongle_8h.html" title=" " alt="" coords="5,81,227,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,43,140,83,137,78,209,39"/>
+<area shape="rect" id="Node000005" href="$Rp2040Dongle_8h.html" title=" " alt="" coords="251,81,488,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="278,38,349,80,344,81,278,44"/>
+<area shape="rect" id="Node000003" href="$TinyWifiDonglePortEsp32_8h.html" title=" " alt="" coords="26,157,206,201"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="117,122,119,157,113,155,115,127"/>
+<area shape="rect" id="Node000004" href="$TinyWifiDongle_8h.html" title="Header&#45;only USB WiFi dongle for Arduino." alt="" coords="38,249,194,277"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,215,118,250,114,248,114,219"/>
+<area shape="rect" id="Node000006" href="$TinyWifiDonglePortRp2040_8h.html" title=" " alt="" coords="279,157,460,201"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="371,122,372,157,367,155,368,127"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="twd::L2Bridge" name="twd::L2Bridge">
+<area shape="rect" id="Node000001" title="Layer&#45;2 bridge between the USB host and the uplink network." alt="" coords="26,81,136,109"/>
+<area shape="rect" id="Node000002" href="$classtwd_1_1FrameReceiver.html" title="Consumer of Ethernet frames." alt="" coords="5,5,157,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,47,84,81,78,80,79,51"/>
+</map>

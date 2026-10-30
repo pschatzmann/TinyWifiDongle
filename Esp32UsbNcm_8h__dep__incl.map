@@ -1,0 +1,9 @@
+<map id="src/ports/esp32/Esp32UsbNcm.h" name="src/ports/esp32/Esp32UsbNcm.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="22,5,210,50"/>
+<area shape="rect" id="Node000002" href="$Esp32Dongle_8h.html" title=" " alt="" coords="5,98,227,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,63,119,98,113,97,115,68"/>
+<area shape="rect" id="Node000003" href="$TinyWifiDonglePortEsp32_8h.html" title=" " alt="" coords="26,174,206,218"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="117,139,119,174,113,172,115,144"/>
+<area shape="rect" id="Node000004" href="$TinyWifiDongle_8h.html" title="Header&#45;only USB WiFi dongle for Arduino." alt="" coords="38,266,194,294"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,232,118,267,114,265,114,236"/>
+</map>

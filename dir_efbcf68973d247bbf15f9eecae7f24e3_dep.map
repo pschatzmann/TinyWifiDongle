@@ -1,0 +1,15 @@
+<map id="src/ports" name="src/ports">
+<area shape="rect" id="node1" href="dir_aebb8dcc11953d78e620bbef0b9e2183.html" title="core" alt="" coords="87,216,137,244"/>
+<area shape="rect" id="node3" href="dir_061266da2d52be3ed823c70ab2079e8c.html" title="esp32" alt="" coords="38,141,98,168"/>
+<area shape="poly" id="edge1" href="dir_000002_000001.html" alt="" coords="103,95,86,129,81,126,106,90"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000002_000001.html" title="1" alt="" coords="88,121,96,138"/>
+<area shape="rect" id="node4" href="dir_3047dcfccd5b744099cd5071f2ee3d3c.html" title="rp2040" alt="" coords="123,141,189,168"/>
+<area shape="poly" id="edge2" href="dir_000002_000003.html" alt="" coords="120,90,143,127,138,128,119,95"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000002_000003.html" title="1" alt="" coords="142,112,150,129"/>
+<area shape="poly" id="edge3" href="dir_000001_000000.html" alt="" coords="77,166,99,203,94,203,75,171"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000001_000000.html" title="4" alt="" coords="98,188,106,205"/>
+<area shape="poly" id="edge4" href="dir_000003_000000.html" alt="" coords="150,167,130,205,126,201,146,170"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000003_000000.html" title="3" alt="" coords="132,196,140,213"/>
+<area shape="rect" id="clust2" href="dir_efbcf68973d247bbf15f9eecae7f24e3.html" alt="" coords="27,54,200,179"/>
+<area shape="rect" id="clust1" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="16,16,211,255"/>
+</map>

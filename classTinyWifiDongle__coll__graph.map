@@ -1,0 +1,5 @@
+<map id="TinyWifiDongle" name="TinyWifiDongle">
+<area shape="rect" id="Node000001" title="Shares the microcontroller&#39;s WiFi connection with a USB host." alt="" coords="14,106,135,134"/>
+<area shape="rect" id="Node000002" href="$classtwd_1_1Esp32Dongle.html" title="ESP32&#45;S2/S3 dongle: raw Ethernet frames between USB and WiFi." alt="" coords="5,5,144,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,47,77,106,72,105,72,50"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="twd::Rp2040UsbNcm" name="twd::Rp2040UsbNcm">
+<area shape="rect" id="Node000001" title="USB CDC&#45;NCM network device for the Raspberry Pi Pico W / Pico 2 W." alt="" coords="5,81,163,109"/>
+<area shape="rect" id="Node000002" href="$classtwd_1_1UsbTransport.html" title="Moves Ethernet frames between the MCU and the USB host." alt="" coords="15,5,153,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,47,87,81,81,80,82,51"/>
+</map>

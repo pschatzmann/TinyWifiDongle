@@ -1,0 +1,7 @@
+<map id="twd::UsbTransport" name="twd::UsbTransport">
+<area shape="rect" id="Node000001" title="Moves Ethernet frames between the MCU and the USB host." alt="" coords="98,5,236,33"/>
+<area shape="rect" id="Node000002" href="$classtwd_1_1Esp32UsbNcm.html" title="USB CDC&#45;NCM network device for the ESP32&#45;S2/S3 (TinyUSB)." alt="" coords="5,81,153,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,43,96,83,93,78,137,44"/>
+<area shape="rect" id="Node000003" href="$classtwd_1_1Rp2040UsbNcm.html" title="USB CDC&#45;NCM network device for the Raspberry Pi Pico W / Pico 2 W." alt="" coords="176,81,334,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,41,242,81,237,80,193,46"/>
+</map>

@@ -1,0 +1,30 @@
+<map id="src/ports/esp32/Esp32WifiFrameLink.h" name="src/ports/esp32/Esp32WifiFrameLink.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="265,5,453,50"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,89,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="275,53,105,98,103,93,277,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="112,98,174,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="300,52,189,96,187,91,304,49"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="197,98,289,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="331,49,276,91,273,86,326,52"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="313,98,405,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="360,48,361,84,357,81,358,53"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="429,98,526,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="391,48,449,89,444,89,390,53"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="551,98,687,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="428,48,566,92,560,94,428,53"/>
+<area shape="rect" id="Node000008" href="$Interfaces_8h.html" title="Portable abstractions the dongle is built from." alt="" coords="711,98,866,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="454,44,707,94,702,96,454,50"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="657,249,728,277"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="783,125,711,238,707,234,778,127"/>
+<area shape="rect" id="Node000010" href="$Logger_8h.html" title="Printf&#45;style logging through the global TWD_LOGGER object." alt="" coords="792,174,868,201"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="797,124,817,161,812,159,794,129"/>
+<area shape="poly" id="edge12_Node000010_Node000009" title=" " alt="" coords="808,201,731,244,729,239,803,203"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="751,249,815,277"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="824,201,801,239,798,234,819,203"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="839,249,914,277"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="839,200,862,237,858,235,837,204"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="937,249,1002,277"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="855,199,934,242,929,241,854,204"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1026,249,1097,277"/>
+<area shape="poly" id="edge14_Node000010_Node000014" title=" " alt="" coords="869,198,1014,246,1009,246,868,204"/>
+</map>

@@ -1,0 +1,27 @@
+<map id="src/core/Interfaces.h" name="src/core/Interfaces.h">
+<area shape="rect" id="Node000001" title="Portable abstractions the dongle is built from." alt="" coords="426,5,579,33"/>
+<area shape="rect" id="Node000002" href="$L2Bridge_8h.html" title=" " alt="" coords="430,90,575,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="504,47,505,90,500,88,501,51"/>
+<area shape="rect" id="Node000008" href="$Esp32UsbNcm_8h.html" title=" " alt="" coords="5,81,194,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="421,39,195,85,193,80,424,34"/>
+<area shape="rect" id="Node000009" href="$Esp32WifiFrameLink_8h.html" title=" " alt="" coords="217,81,406,126"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="455,41,363,83,361,78,460,38"/>
+<area shape="rect" id="Node000010" href="$Rp2040UsbNcm_8h.html" title=" " alt="" coords="599,81,803,126"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="548,37,651,80,645,81,548,42"/>
+<area shape="rect" id="Node000011" href="$Rp2040WifiFrameLink_8h.html" title=" " alt="" coords="827,81,1031,126"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="585,34,829,82,824,83,585,39"/>
+<area shape="rect" id="Node000003" href="$Esp32Dongle_8h.html" title=" " alt="" coords="201,174,422,201"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="455,125,343,176,341,171,460,122"/>
+<area shape="rect" id="Node000006" href="$Rp2040Dongle_8h.html" title=" " alt="" coords="582,174,820,201"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="548,121,672,173,666,173,548,126"/>
+<area shape="rect" id="Node000004" href="$TinyWifiDonglePortEsp32_8h.html" title=" " alt="" coords="221,249,402,294"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="313,215,314,250,309,247,310,219"/>
+<area shape="rect" id="Node000005" href="$TinyWifiDongle_8h.html" title="Header&#45;only USB WiFi dongle for Arduino." alt="" coords="234,342,389,370"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="313,308,314,343,309,340,310,312"/>
+<area shape="rect" id="Node000007" href="$TinyWifiDonglePortRp2040_8h.html" title=" " alt="" coords="611,249,791,294"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="703,215,703,250,699,247,699,219"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="170,129,280,172,275,174,170,134"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="313,139,314,174,309,172,310,144"/>
+<area shape="poly" id="edge12_Node000010_Node000006" title=" " alt="" coords="702,139,703,175,699,172,699,144"/>
+<area shape="poly" id="edge14_Node000011_Node000006" title=" " alt="" coords="857,131,738,176,737,171,852,132"/>
+</map>
