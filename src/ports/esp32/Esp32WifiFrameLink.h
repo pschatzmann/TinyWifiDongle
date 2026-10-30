@@ -25,22 +25,25 @@ namespace twd {
  */
 class Esp32WifiFrameLink : public Uplink, public FrameLink {
  public:
-  /// Create the link; WiFi is not touched before begin().
-  explicit Esp32WifiFrameLink(Logger& log) : log_(log) {}
-
   bool begin(const char* ssid, const char* password) override {
     instance() = this;
     esp_timer_create_args_t args = {};
     args.callback = &Esp32WifiFrameLink::claimRxTimer;
     args.arg = this;
     args.name = "wifiRx";
-    if (esp_timer_create(&args, &claimTimer_) != ESP_OK) return false;
+    if (esp_timer_create(&args, &claimTimer_) != ESP_OK) {
+      TWD_LOGGER.error("WiFi: could not create the receive hook timer");
+      return false;
+    }
     WiFi.mode(WIFI_STA);
     WiFi.setSleep(false);  // modem sleep delays downlink packets; a dongle must stay awake
     stopDhcpClient();
     WiFi.onEvent(&Esp32WifiFrameLink::onConnected, ARDUINO_EVENT_WIFI_STA_CONNECTED);
     WiFi.onEvent(&Esp32WifiFrameLink::onDisconnected, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-    WiFi.begin(ssid, password);
+    if (WiFi.begin(ssid, password) == WL_CONNECT_FAILED) {
+      TWD_LOGGER.error("WiFi: could not start joining '%s' (invalid ssid or password?)", ssid);
+      return false;
+    }
     return true;
   }
 
@@ -62,7 +65,10 @@ class Esp32WifiFrameLink : public Uplink, public FrameLink {
   const uint8_t* macAddress() override {
     if (!macValid_) {
       WiFi.mode(WIFI_STA);  // initializes WiFi (and the companion chip); harmless if already done
-      if (esp_wifi_get_mac(WIFI_IF_STA, mac_) != ESP_OK) esp_read_mac(mac_, ESP_MAC_WIFI_STA);
+      if (esp_wifi_get_mac(WIFI_IF_STA, mac_) != ESP_OK) {
+        TWD_LOGGER.warning("WiFi: station MAC not available from the WiFi stack, using the one from the fuses");
+        esp_read_mac(mac_, ESP_MAC_WIFI_STA);
+      }
       macValid_ = true;
     }
     return mac_;
@@ -71,7 +77,6 @@ class Esp32WifiFrameLink : public Uplink, public FrameLink {
  private:
   static constexpr int kClaims = 4;  // times the receive hook is re-asserted after a connect
 
-  Logger& log_;
   FrameReceiver* receiver_ = nullptr;
   esp_timer_handle_t claimTimer_ = nullptr;
   uint8_t mac_[6] = {};
@@ -101,7 +106,8 @@ class Esp32WifiFrameLink : public Uplink, public FrameLink {
   // possibly after our event handler ran. Register ours again a few times.
   void claimRx() {
     stopDhcpClient();
-    esp_wifi_internal_reg_rxcb(WIFI_IF_STA, &Esp32WifiFrameLink::rxHook);
+    esp_err_t err = esp_wifi_internal_reg_rxcb(WIFI_IF_STA, &Esp32WifiFrameLink::rxHook);
+    if (err != ESP_OK) TWD_LOGGER.error("WiFi: could not take over frame reception (%s)", esp_err_to_name(err));
   }
   
   static void claimRxTimer(void* arg) {
@@ -118,14 +124,14 @@ class Esp32WifiFrameLink : public Uplink, public FrameLink {
     s->claimRx();
     esp_timer_stop(s->claimTimer_);
     esp_timer_start_once(s->claimTimer_, 250000);
-    s->log_.log("WiFi associated, forwarding raw frames");
+    TWD_LOGGER.info("WiFi associated, forwarding raw frames");
   }
 
   static void onDisconnected(arduino_event_t* e) {
     Esp32WifiFrameLink* s = instance();
     if (!s) return;
     s->associated_ = false;
-    s->log_.log("WiFi disconnected, reason=%d", (int)e->event_info.wifi_sta_disconnected.reason);
+    TWD_LOGGER.warning("WiFi disconnected, reason=%d", (int)e->event_info.wifi_sta_disconnected.reason);
   }
 };
 

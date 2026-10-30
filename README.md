@@ -8,7 +8,7 @@ A __header-only C++ Arduino library__ that turns a microcontroller into a __USB 
 - No driver needed on the PC: Linux, macOS and Windows 11 have a CDC-NCM driver built in
 - Ethernet frames are bridged unchanged between USB and WiFi, so the PC is a normal client of your WiFi network and gets its address from your router's DHCP server. The MCU itself has no IP address
 - Speed is limited by the full-speed USB (12 Mbit/s) of these chips: about 600 KB/s on the ESP32-S3 and about 250 KB/s on the Pico 2 W in the tests. Fine for browsing and downloads, but much slower than a PC's own WiFi ([details](docs/status.md))
-- Messages go to a serial port: `Serial0` (UART) or a USB serial port next to the adapter that also lets you upload sketches without holding BOOT/BOOTSEL ([details](docs/behaviour.md))
+- Messages go to any `Print` the sketch passes to `TWD_LOGGER`, e.g. a UART or a USB serial port ([details](docs/logging.md))
 - Credentials can be hard-coded or entered in a browser on a setup page the board opens itself ([details](docs/setup.md)), with no additional library
 
 ## Supported platforms
@@ -45,7 +45,8 @@ Board settings (the board is then connected to the PC with its USB connector):
 - [Examples](docs/examples.md)
 - [WiFi setup in a browser](docs/setup.md) (`TinyWifiDongleSetup`)
 - [Configuration](docs/configuration.md)
-- [How it behaves](docs/behaviour.md) (addresses, log output, status line, stall watchdog)
+- [Logging](docs/logging.md) (`TWD_LOGGER`: output, log levels)
+- [How it behaves](docs/behaviour.md) (addresses, status line, stall watchdog)
 - [Host setup tips](docs/host-setup.md) (route priority, NetworkManager, MTU, reading the counters, Wake-on-LAN)
 - [Status](docs/status.md) (per platform, throughput) and [Known issues](docs/known-issues.md) (the ESP32 USB stall, the Pico)
 - [Architecture](docs/architecture.md) (classes, bridge rules, analysis of the USB stall)

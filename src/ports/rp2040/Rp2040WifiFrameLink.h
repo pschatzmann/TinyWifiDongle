@@ -35,8 +35,8 @@ namespace twd {
  */
 class Rp2040WifiFrameLink : public Uplink, public FrameLink {
  public:
-  /// Create the link; WiFi is not touched before macAddress() or begin().
-  explicit Rp2040WifiFrameLink(Logger& log) : log_(log) {}
+  /// While the station is not associated, a warning is logged this often.
+  static constexpr uint32_t kNotJoinedReportMs = 10000;
 
   bool begin(const char* ssid, const char* password) override {
     instance() = this;
@@ -44,6 +44,7 @@ class Rp2040WifiFrameLink : public Uplink, public FrameLink {
     // The core's begin() starts an access point when it finds the mode WIFI_AP, which a previous
     // setup page can leave behind (WiFi.mode(WIFI_OFF) does not reset it), so ask for the station.
     WiFi.mode(WIFI_STA);
+    ssid_ = ssid;
     if (password) {
       WiFi.beginNoBlock(ssid, password);
     } else {
@@ -51,7 +52,10 @@ class Rp2040WifiFrameLink : public Uplink, public FrameLink {
     }
     timer_.user_data = this;
     timer_.do_work = &Rp2040WifiFrameLink::maintainCb;
-    async_context_add_at_time_worker_in_ms(__getEthernetContext(), &timer_, 500);
+    if (!async_context_add_at_time_worker_in_ms(__getEthernetContext(), &timer_, 500)) {
+      TWD_LOGGER.error("WiFi: could not add the worker to the async context");
+      return false;
+    }
     return true;
   }
 
@@ -75,12 +79,14 @@ class Rp2040WifiFrameLink : public Uplink, public FrameLink {
   }
 
  private:
-  Logger& log_;
   FrameReceiver* receiver_ = nullptr;
   uint8_t mac_[6] = {};
   bool macValid_ = false;
   volatile bool connected_ = false;
   async_at_time_worker_t timer_ = {};
+  String ssid_;
+  uint32_t downSince_ = 0;   // millis() when the link went down, 0 = up
+  uint32_t reportedAt_ = 0;  // millis() of the last "not associated" warning
 
   static Rp2040WifiFrameLink*& instance() {
     static Rp2040WifiFrameLink* p = nullptr;
@@ -105,19 +111,41 @@ class Rp2040WifiFrameLink : public Uplink, public FrameLink {
     (void)ctx;
   }
 
+  static const char* linkStatus() {
+    switch (cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA)) {
+      case CYW43_LINK_JOIN: return "joined, link not up";
+      case CYW43_LINK_FAIL: return "connection failed";
+      case CYW43_LINK_NONET: return "network not found";
+      case CYW43_LINK_BADAUTH: return "wrong password";
+      default: return "joining";
+    }
+  }
+
   void maintain() {
     struct netif* n = __getCYW43Netif();
     if (!n) {
+      if (connected_) TWD_LOGGER.warning("WiFi disconnected: the station interface is gone");
       connected_ = false;
       return;
     }
     if (n->input != &Rp2040WifiFrameLink::inputHook) {
       n->input = &Rp2040WifiFrameLink::inputHook;
-      log_.log("WiFi station: frames are bridged");
+      TWD_LOGGER.info("WiFi station: frames are bridged");
     }
     if (dhcp_supplied_address(n) || netif_dhcp_data(n)) dhcp_stop(n);  // the host asks the network, not us
     bool up = netif_is_link_up(n);
-    if (up != connected_) log_.log(up ? "WiFi associated, forwarding raw frames" : "WiFi disconnected");
+    if (up && !connected_) TWD_LOGGER.info("WiFi associated, forwarding raw frames");
+    if (!up && connected_) TWD_LOGGER.warning("WiFi disconnected");
+    uint32_t now = millis();
+    if (up) {
+      downSince_ = 0;
+    } else if (!downSince_) {
+      downSince_ = reportedAt_ = now | 1;
+    } else if (now - reportedAt_ >= kNotJoinedReportMs) {  // the core retries silently: say why nothing happens
+      TWD_LOGGER.warning("WiFi: not associated with '%s' for %u s (%s)", ssid_.c_str(),
+                         (unsigned)((now - downSince_) / 1000), linkStatus());
+      reportedAt_ = now;
+    }
     connected_ = up;
   }
 };

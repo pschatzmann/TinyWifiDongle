@@ -11,7 +11,7 @@
 The P4 has a high-speed USB controller but no WiFi radio of its own: the core drives an ESP32-C6 companion chip over SDIO (ESP-Hosted / esp_wifi_remote). What is prepared:
 
 - The USB adapter takes the station MAC reported by the WiFi stack (`esp_wifi_get_mac`), which on the P4 is the companion chip's MAC, the one the access point sees. On the ESP32-S3 it is the same value as before.
-- Logging goes to UART0 (`Serial0`) by default on the P4, i.e. through the board's USB-UART bridge; the USB connection then carries only the network adapter.
+- Log to UART0 (`TWD_LOGGER.begin(Serial0)`) on the P4, i.e. through the board's USB-UART bridge; the USB connection then carries only the network adapter.
 - The register dump of the USB controller (`Esp32UsbNcm::logControllerState()`) exists on the ESP32-S2/S3 only; on other chips it only prints that it is not available.
 - The raw WiFi functions the bridge uses (`esp_wifi_internal_reg_rxcb`, `esp_wifi_internal_tx`, `esp_wifi_internal_free_rx_buffer`) are provided by esp_wifi_remote.
 
@@ -35,7 +35,7 @@ Port for the arduino-pico core (`rp2040:rp2040`, tested with 6.3.1) with the def
 
 - USB: the core's CDC-NCM class driver (`tusb-ncm`), registered like the core's own NCM driver does it. Frames are exchanged through queues and two pools of frame buffers, one per direction (`framesToHost`, `framesFromHost`, see [configuration.md](configuration.md)); a worker in the core's lwIP/CYW43 async context moves them in and out of the USB stack under the USB mutex.
 - WiFi: the connection is made with the core's WiFi class. Afterwards the station's lwIP interface gets a replaced input function (frames go to the bridge) and its DHCP client is stopped; frames are sent with `cyw43_send_ethernet()`. A worker re-applies this twice a second, because the core may restart DHCP after a reconnect. The adapter uses the chip's station MAC address.
-- Logging: by default to the USB serial port (`Serial`), or to `Serial1` (GP0/GP1) with `LogTarget::Uart0`.
+- Logging: to the USB serial port (`TWD_LOGGER.begin(Serial)`) or to `Serial1` (GP0/GP1).
 - Ignored on the Pico: `manageUsb`, `pinUsbTask`, `stallTimeoutMs`, `usbMaxFrame` (they belong to the ESP32 USB driver).
 
 **Tested** on a Pico 2 W (MTU 1400 on the host): the adapter appears next to a serial port, the host gets its address from the router (192.168.1.x) through the bridge, ping to the router takes about 5 ms, HTTPS requests under 0.2 s. With the default buffers, 40 consecutive 3 MB downloads (120 MB) all completed, at 110-320 KB/s (average 246 KB/s); about 1.5% of the frames towards the host were dropped because a buffer pool was full, and none of the frames from the host.

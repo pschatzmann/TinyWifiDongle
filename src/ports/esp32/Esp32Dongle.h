@@ -4,7 +4,6 @@
 
 #include "../../TinyWifiDongleConfig.h"
 #include "../../core/L2Bridge.h"
-#include "Esp32SerialLogger.h"
 #include "Esp32UsbNcm.h"
 #include "Esp32UsbTaskPin.h"
 #include "Esp32WifiFrameLink.h"
@@ -21,34 +20,43 @@ namespace twd {
  */
 class Esp32Dongle {
  public:
-  Esp32Dongle() : usb_(log_), link_(log_), bridge_(usb_, link_, log_) {}
+  Esp32Dongle() : bridge_(usb_, link_) {}
 
   /// Start USB and WiFi and bridge them; false if a part could not be started.
   bool begin(const TinyWifiDongleConfig& cfg) {
-    if (!cfg.ssid) return false;
+    if (!cfg.ssid) {
+      TWD_LOGGER.error("begin: no ssid");
+      return false;
+    }
     ssid_ = cfg.ssid;
     password_ = cfg.password ? cfg.password : "";
     product_ = cfg.productName;
     hasPassword_ = cfg.password != nullptr;
 
     statsIntervalMs_ = cfg.statsIntervalMs;
-    log_.begin(cfg.logTarget);
-    if (log_.enabled() && statsIntervalMs_) {
-      xTaskCreate(&Esp32Dongle::statsTask, "dongleStats", 6144, this, 10, nullptr);
+    if (TWD_LOGGER.enabled() && statsIntervalMs_) {
+      if (xTaskCreate(&Esp32Dongle::statsTask, "dongleStats", 6144, this, 10, nullptr) != pdPASS) {
+        TWD_LOGGER.warning("status line: could not start its task");
+      }
     }
-    log_.log("starting: ssid='%s'", ssid_.c_str());
+    TWD_LOGGER.info("starting: ssid='%s'", ssid_.c_str());
 
     usb_.setMaxFrame(cfg.usbMaxFrame);
     usb_.setStallTimeout(cfg.stallTimeoutMs);
     usb_.setHostMac(link_.macAddress());  // the access point only accepts the station's MAC
     if (!usb_.begin(product_.c_str())) return false;
     bridge_.begin();
-    link_.begin(ssid_.c_str(), hasPassword_ ? password_.c_str() : nullptr);
+    if (!link_.begin(ssid_.c_str(), hasPassword_ ? password_.c_str() : nullptr)) return false;
 
     if (cfg.manageUsb) {
       USB.productName(product_.c_str());
-      if (!USB.begin()) return false;
-      if (cfg.pinUsbTask) usbPin_.begin(xPortGetCoreID());  // the USB interrupt lives on this core
+      if (!USB.begin()) {
+        TWD_LOGGER.error("USB: USB.begin() failed");
+        return false;
+      }
+      if (cfg.pinUsbTask && !usbPin_.begin(xPortGetCoreID())) {  // the USB interrupt lives on this core
+        TWD_LOGGER.warning("USB: could not start the task that pins the USB task; send stalls are more likely");
+      }
     }
     return true;
   }
@@ -59,7 +67,6 @@ class Esp32Dongle {
   bool uplinkConnected() { return link_.connected(); }
 
  private:
-  Esp32SerialLogger log_;
   Esp32UsbNcm usb_;
   Esp32WifiFrameLink link_;
   L2Bridge bridge_;
@@ -79,10 +86,10 @@ class Esp32Dongle {
       Esp32UsbNcm::Stats u = s->usb_.stats();
       L2Bridge::Stats b = s->bridge_.stats();
       // Short on purpose: the log port drops what does not fit its buffer.
-      s->log_.log("w%d toL=%u toH=%u rf=%u dr=%u | u rx=%u tx=%u td=%u bz=%u q=%u rs=%u", (int)s->link_.connected(),
-                  (unsigned)b.toLink, (unsigned)b.toHost, (unsigned)b.reflected, (unsigned)b.dropped,
-                  (unsigned)u.rxFrames, (unsigned)u.txFrames, (unsigned)u.txDrops, (unsigned)u.txBusy,
-                  (unsigned)s->usb_.txQueued(), (unsigned)u.resets);
+      TWD_LOGGER.info("w%d toL=%u toH=%u rf=%u dr=%u | u rx=%u tx=%u td=%u bz=%u q=%u rs=%u", (int)s->link_.connected(),
+                      (unsigned)b.toLink, (unsigned)b.toHost, (unsigned)b.reflected, (unsigned)b.dropped,
+                      (unsigned)u.rxFrames, (unsigned)u.txFrames, (unsigned)u.txDrops, (unsigned)u.txBusy,
+                      (unsigned)s->usb_.txQueued(), (unsigned)u.resets);
     }
   }
 };

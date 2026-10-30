@@ -48,24 +48,36 @@ class Esp32UsbNcm : public UsbTransport {
     uint32_t resets;    ///< stall recoveries (USB re-enumerations)
   };
 
-  /// Create the transport; nothing is started before begin().
-  explicit Esp32UsbNcm(Logger& log) : log_(log) {}
-
   bool begin(const char* productName) override {
     product_ = productName;
     instance() = this;
     deriveMacs();
     txQueue_ = xQueueCreate(kTxQueueLen, sizeof(TxItem));
-    if (!txQueue_) return false;
+    if (!txQueue_) {
+      TWD_LOGGER.error("USB: not enough memory for the send queue");
+      return false;
+    }
     esp_timer_create_args_t args = {};
     args.arg = this;
     args.callback = &Esp32UsbNcm::drainTimerCb;
     args.name = "ncmTx";
-    if (esp_timer_create(&args, &drainTimer_) != ESP_OK) return false;
+    if (esp_timer_create(&args, &drainTimer_) != ESP_OK) {
+      TWD_LOGGER.error("USB: could not create the send timer");
+      return false;
+    }
     args.callback = &Esp32UsbNcm::reconnectTimerCb;
     args.name = "ncmUsb";
-    if (esp_timer_create(&args, &reconnectTimer_) != ESP_OK) return false;
-    return tinyusb_enable_interface(USB_INTERFACE_CUSTOM, TUD_CDC_NCM_DESC_LEN, &Esp32UsbNcm::descriptorCb) == ESP_OK;
+    if (esp_timer_create(&args, &reconnectTimer_) != ESP_OK) {
+      TWD_LOGGER.error("USB: could not create the reconnect timer");
+      return false;
+    }
+    esp_err_t err = tinyusb_enable_interface(USB_INTERFACE_CUSTOM, TUD_CDC_NCM_DESC_LEN, &Esp32UsbNcm::descriptorCb);
+    if (err != ESP_OK) {
+      TWD_LOGGER.error("USB: could not register the network interface (%s); was USB already started?",
+                       esp_err_to_name(err));
+      return false;
+    }
+    return true;
   }
 
   bool ready() override { return tud_ready(); }
@@ -126,13 +138,13 @@ class Esp32UsbNcm : public UsbTransport {
     volatile dwc2_regs_t* d = reinterpret_cast<volatile dwc2_regs_t*>(0x60080000);  // USB-OTG of the S2/S3
     unsigned n = epIn_ & 0x7F;
     // Two short lines: the log port drops what does not fit its buffer.
-    log_.log("dw%u ctl=%08x tsiz=%08x int=%08x txs=%x", n, (unsigned)d->epin[n].diepctl, (unsigned)d->epin[n].tsiz,
-             (unsigned)d->epin[n].diepint, (unsigned)d->epin[n].dtxfsts);
+    TWD_LOGGER.warning("dw%u ctl=%08x tsiz=%08x int=%08x txs=%x", n, (unsigned)d->epin[n].diepctl, (unsigned)d->epin[n].tsiz,
+                       (unsigned)d->epin[n].diepint, (unsigned)d->epin[n].dtxfsts);
     vTaskDelay(pdMS_TO_TICKS(100));
-    log_.log("dw em=%08x gi=%08x/%08x da=%08x/%08x", (unsigned)d->diepempmsk, (unsigned)d->gintsts,
-             (unsigned)d->gintmsk, (unsigned)d->daint, (unsigned)d->daintmsk);
+    TWD_LOGGER.warning("dw em=%08x gi=%08x/%08x da=%08x/%08x", (unsigned)d->diepempmsk, (unsigned)d->gintsts,
+                       (unsigned)d->gintmsk, (unsigned)d->daint, (unsigned)d->daintmsk);
 #else
-    log_.log("controller registers: not available on this chip");
+    TWD_LOGGER.warning("controller registers: not available on this chip");
 #endif
   }
 
@@ -165,7 +177,6 @@ class Esp32UsbNcm : public UsbTransport {
     uint16_t len;
   };
 
-  Logger& log_;
   String product_;
   FrameReceiver* receiver_ = nullptr;
   QueueHandle_t txQueue_ = nullptr;
@@ -211,7 +222,10 @@ class Esp32UsbNcm : public UsbTransport {
     uint8_t strMac = tinyusb_add_string_descriptor(s->macStr_);
     uint8_t epData = tinyusb_get_free_duplex_endpoint();
     uint8_t epNotif = tinyusb_get_free_in_endpoint();
-    if (!strDesc || !strMac || !epData || !epNotif) return 0;
+    if (!strDesc || !strMac || !epData || !epNotif) {
+      TWD_LOGGER.error("USB: no free endpoints or string descriptors for the network interface");
+      return 0;
+    }
     s->epIn_ = (uint8_t)(0x80 | epData);
     const uint16_t bulk = TUD_OPT_HIGH_SPEED ? 512 : 64;
     uint8_t desc[] = {TUD_CDC_NCM_DESCRIPTOR(itfnum, strDesc, strMac, (uint8_t)(0x80 | epNotif), 64, epData,
@@ -266,6 +280,8 @@ class Esp32UsbNcm : public UsbTransport {
   // and make the host enumerate the device again.
   void recover() {
     stats_.resets++;
+    TWD_LOGGER.warning("USB: no send progress for %u ms, dropping %u queued frames and re-enumerating",
+                       (unsigned)stallTimeoutMs_, (unsigned)uxQueueMessagesWaiting(txQueue_));
     TxItem it;
     while (xQueueReceive(txQueue_, &it, 0) == pdTRUE) free(it.data);
     stalled_ = false;

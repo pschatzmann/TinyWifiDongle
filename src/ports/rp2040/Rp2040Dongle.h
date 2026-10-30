@@ -3,7 +3,6 @@
 
 #include "../../TinyWifiDongleConfig.h"
 #include "../../core/L2Bridge.h"
-#include "Rp2040SerialLogger.h"
 #include "Rp2040UsbNcm.h"
 #include "Rp2040WifiFrameLink.h"
 
@@ -24,25 +23,29 @@ namespace twd {
  */
 class Rp2040Dongle {
  public:
-  Rp2040Dongle() : usb_(log_), link_(log_), bridge_(usb_, link_, log_) {}
+  Rp2040Dongle() : bridge_(usb_, link_) {}
 
   /// Start USB and WiFi and bridge them; false if a part could not be started.
   bool begin(const TinyWifiDongleConfig& cfg) {
-    if (!cfg.ssid) return false;
-    log_.begin(cfg.logTarget);
-    log_.log("starting: ssid='%s'", cfg.ssid);
+    if (!cfg.ssid) {
+      TWD_LOGGER.error("begin: no ssid");
+      return false;
+    }
+    TWD_LOGGER.info("starting: ssid='%s'", cfg.ssid);
 
     usb_.setBuffers(cfg.framesToHost, cfg.framesFromHost);
     usb_.setHostMac(link_.macAddress());  // the access point only accepts the station's MAC
     if (!usb_.begin(cfg.productName)) return false;
     bridge_.begin();
-    link_.begin(cfg.ssid, cfg.password);
+    if (!link_.begin(cfg.ssid, cfg.password)) return false;
 
-    if (log_.enabled() && cfg.statsIntervalMs) {
+    if (TWD_LOGGER.enabled() && cfg.statsIntervalMs) {
       statsMs_ = cfg.statsIntervalMs;
       stats_.user_data = this;
       stats_.do_work = &Rp2040Dongle::statsCb;
-      async_context_add_at_time_worker_in_ms(__getEthernetContext(), &stats_, statsMs_);
+      if (!async_context_add_at_time_worker_in_ms(__getEthernetContext(), &stats_, statsMs_)) {
+        TWD_LOGGER.warning("status line: could not start its worker");
+      }
     }
     return true;
   }
@@ -58,7 +61,6 @@ class Rp2040Dongle {
   Rp2040UsbNcm::Stats usbStats() const { return usb_.stats(); }
 
  private:
-  Rp2040SerialLogger log_;
   Rp2040UsbNcm usb_;
   Rp2040WifiFrameLink link_;
   L2Bridge bridge_;
@@ -69,10 +71,10 @@ class Rp2040Dongle {
     Rp2040Dongle* s = (Rp2040Dongle*)w->user_data;
     L2Bridge::Stats b = s->bridge_.stats();
     Rp2040UsbNcm::Stats u = s->usb_.stats();
-    s->log_.log("w%d toL=%u toH=%u rf=%u dr=%u | u rx=%u tx=%u td=%u rd=%u q=%u", (int)s->link_.connected(),
-                (unsigned)b.toLink, (unsigned)b.toHost, (unsigned)b.reflected, (unsigned)b.dropped,
-                (unsigned)u.rxFrames, (unsigned)u.txFrames, (unsigned)u.txDrops, (unsigned)u.rxDrops,
-                (unsigned)s->usb_.txQueued());
+    TWD_LOGGER.info("w%d toL=%u toH=%u rf=%u dr=%u | u rx=%u tx=%u td=%u rd=%u q=%u", (int)s->link_.connected(),
+                    (unsigned)b.toLink, (unsigned)b.toHost, (unsigned)b.reflected, (unsigned)b.dropped,
+                    (unsigned)u.rxFrames, (unsigned)u.txFrames, (unsigned)u.txDrops, (unsigned)u.rxDrops,
+                    (unsigned)s->usb_.txQueued());
     w->next_time = make_timeout_time_ms(s->statsMs_);
   }
 };

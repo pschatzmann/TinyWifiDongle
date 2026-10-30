@@ -10,14 +10,16 @@
 // below, so the PC gets its address from that network's DHCP server (e.g.
 // 192.168.1.x) like any other WiFi client; the board itself has no IP address.
 //
-// Besides the adapter the board shows up as a serial port, which lets you
-// upload a new sketch without holding BOOT/BOOTSEL. See docs/configuration.md
-// for the options.
+// Messages go to Serial: UART0 on the ESP32-S3 / S2, the USB serial port on
+// the Pico. Remove TWD_LOGGER.begin() for no output. See docs/logging.md and
+// docs/configuration.md for the options.
 #include "TinyWifiDongle.h"
 
 TinyWifiDongle dongle;
 
 void setup() {
+  Serial.begin(115200);
+  TWD_LOGGER.begin(Serial);  // before dongle.begin(), so its messages are not lost
   if (!dongle.begin("my-ssid", "my-password")) {
     while (true) delay(1000);
   }

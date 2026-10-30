@@ -32,15 +32,15 @@ class L2Bridge : public FrameReceiver {
   };
 
   /// Bridge `usb` and `link`.
-  L2Bridge(UsbTransport& usb, FrameLink& link, Logger& log) : usb_(usb), link_(link), log_(log), down_(*this) {}
+  L2Bridge(UsbTransport& usb, FrameLink& link) : usb_(usb), link_(link), down_(*this) {}
 
   /// Start forwarding; both sides must already be started.
   void begin() {
     usb_.setReceiver(this);
     link_.setFrameReceiver(&down_);
-    log_.log("bridge: host adapter uses MAC %02x:%02x:%02x:%02x:%02x:%02x", link_.macAddress()[0],
-             link_.macAddress()[1], link_.macAddress()[2], link_.macAddress()[3], link_.macAddress()[4],
-             link_.macAddress()[5]);
+    TWD_LOGGER.info("bridge: host adapter uses MAC %02x:%02x:%02x:%02x:%02x:%02x", link_.macAddress()[0],
+                    link_.macAddress()[1], link_.macAddress()[2], link_.macAddress()[3], link_.macAddress()[4],
+                    link_.macAddress()[5]);
   }
 
   /// Current counters.
@@ -86,7 +86,6 @@ class L2Bridge : public FrameReceiver {
 
   UsbTransport& usb_;
   FrameLink& link_;
-  Logger& log_;
   Downstream down_;
   Stats stats_ = {};
 };

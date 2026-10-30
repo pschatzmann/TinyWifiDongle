@@ -2,23 +2,6 @@
 // Portable configuration shared by all ports.
 #include <stdint.h>
 
-/// Where the library prints its messages and the optional status line.
-enum class LogTarget {
-  /// UART0 ("Serial0") on the ESP32-P4, whose dev boards have a USB-UART bridge;
-  /// a serial port on the USB connection (UsbCdc) on the ESP32-S2/S3.
-  Default,
-  /// No output and no extra USB serial port.
-  None,
-  /// A USB serial port (CDC) next to the network adapter. It also lets the
-  /// board be flashed without BOOT+RESET (ESP32-S2/S3).
-  UsbCdc,
-  /// Hardware serial port UART0 (115200 baud): "Serial0" on the ESP32, "Serial1"
-  /// (GP0/GP1) on the Raspberry Pi Pico. Use it with the USB-UART bridge of a
-  /// dev board or an external adapter. Keeps the USB connection free of any
-  /// serial port.
-  Uart0,
-};
-
 /**
  * @brief Settings of the dongle; every field has a usable default except the SSID.
  *
@@ -39,11 +22,7 @@ struct TinyWifiDongleConfig {
   /// begin() then only registers the network interface.
   bool manageUsb = true;
 
-  /// Where messages are printed, see LogTarget. The core's own log_x() output
-  /// is never redirected.
-  LogTarget logTarget = LogTarget::Default;
-
-  /// Interval in milliseconds of the status line on the log target; 0 = never
+  /// Interval in milliseconds of the status line on TWD_LOGGER; 0 = never
   /// (default). Only useful while debugging.
   uint32_t statsIntervalMs = 0;
 

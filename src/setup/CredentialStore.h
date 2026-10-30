@@ -23,19 +23,19 @@ class CredentialStore {
   /// True if a network is saved (after load() or save()).
   bool valid() const { return data_.magic == kMagic && data_.ssid[0] != 0; }
 
-  /// Saves the network; an empty or null password means an open network.
-  void save(const char* ssid, const char* password) {
+  /// Saves the network; an empty or null password means an open network. False if the flash could not be written.
+  bool save(const char* ssid, const char* password) {
     memset(&data_, 0, sizeof(data_));
     data_.magic = kMagic;
     snprintf(data_.ssid, sizeof(data_.ssid), "%s", ssid ? ssid : "");
     snprintf(data_.password, sizeof(data_.password), "%s", password ? password : "");
-    write();
+    return write();
   }
 
-  /// Removes the saved network.
-  void forget() {
+  /// Removes the saved network. False if the flash could not be written.
+  bool forget() {
     memset(&data_, 0, sizeof(data_));
-    write();
+    return write();
   }
 
   /// Name of the saved network.
@@ -61,10 +61,10 @@ class CredentialStore {
     begun_ = true;
   }
 
-  void write() {
+  bool write() {
     begin();
     EEPROM.put(0, data_);
-    EEPROM.commit();
+    return EEPROM.commit();
   }
 };
 

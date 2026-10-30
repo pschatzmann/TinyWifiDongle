@@ -7,6 +7,7 @@
  * in the web server. Works on the ESP32 and on the Raspberry Pi Pico W / Pico 2 W
  * and needs no additional library.
  */
+#include "core/Logger.h"
 #include "setup/Board.h"
 #include "setup/CredentialStore.h"
 #include "setup/SetupPortal.h"
@@ -49,20 +50,20 @@ class TinyWifiDongleSetup {
   /// How long a start may take to join the network before the saved network is forgotten and the setup opens again; 0 = never. Default 60000.
   void setJoinTimeout(uint32_t ms) { joinTimeoutMs_ = ms; }
 
-  /// Prints what the setup does (the address of the setup page, connected devices, requests) to `out`, e.g. `Serial`; nullptr switches it off.
-  void setLog(Print* out) { portal_.setLog(out); }
-
   /// Loads the saved network, or opens the setup and blocks until the user has entered one.
   void begin() {
     bool known = store_.load();
     if (forgetWindowMs_ && twd::Board::buttonPressedWithin(forgetWindowMs_)) {
-      store_.forget();
+      TWD_LOGGER.info("setup: button pressed, forgetting the saved network");
+      if (!store_.forget()) TWD_LOGGER.error("setup: could not write the flash");
       known = false;
     }
     if (!known) {
       String ssid, password;
       portal_.run(ssid, password);
-      store_.save(ssid.c_str(), password.c_str());
+      if (!store_.save(ssid.c_str(), password.c_str())) {
+        TWD_LOGGER.error("setup: could not write the flash, the network is only used until the next start");
+      }
     }
     startedAt_ = millis();
   }
@@ -81,7 +82,10 @@ class TinyWifiDongleSetup {
     if (connected) {
       connected_ = true;
     } else if (!connected_ && joinTimeoutMs_ && millis() - startedAt_ > joinTimeoutMs_) {
-      store_.forget();
+      TWD_LOGGER.warning("setup: could not join '%s' within %u ms, forgetting it and restarting", ssid(),
+                         (unsigned)joinTimeoutMs_);
+      if (!store_.forget()) TWD_LOGGER.error("setup: could not write the flash");
+      TWD_LOGGER.flush();
       twd::Board::restart();
     }
   }

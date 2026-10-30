@@ -6,8 +6,7 @@ Pass a `TinyWifiDongleConfig` to `begin()` (all fields except `ssid` are optiona
 |---|---|---|---|
 | `ssid`, `password` | - | all | WiFi network to join (`password = nullptr` for an open network) |
 | `productName` | `"TinyWifiDongle"` | all | USB product string shown on the host |
-| `logTarget` | `Default` | all | where messages go: `Uart0`, `UsbCdc` or `None`, see below |
-| `statsIntervalMs` | `0` | all | interval of the status line in ms, `0` = never. Only useful while debugging |
+| `statsIntervalMs` | `0` | all | interval of the status line in ms, `0` = never. Only printed if logging is on ([logging.md](logging.md)). Only useful while debugging |
 | `manageUsb` | `true` | ESP32 | the library calls `USB.begin()`; set `false` if the sketch adds other USB interfaces and starts USB itself |
 | `pinUsbTask` | `true` | ESP32 | run the TinyUSB task on the CPU core of the USB interrupt (greatly reduces a driver race, see [known-issues.md](known-issues.md)); needs `manageUsb` |
 | `stallTimeoutMs` | `1000` | ESP32 | safety net: re-enumerate USB if sending to the host stalls this long (the host sees a replug); `0` = never reset |
@@ -16,16 +15,9 @@ Pass a `TinyWifiDongleConfig` to `begin()` (all fields except `ssid` are optiona
 
 The settings marked ESP32 are accepted but ignored on the Raspberry Pi Pico, and the settings marked Pico are ignored on the ESP32.
 
-## Log target
+## Logging
 
-| `logTarget` | ESP32-S2/S3 | ESP32-P4 | Raspberry Pi Pico W / 2 W |
-|---|---|---|---|
-| `Default` | = `UsbCdc` | = `Uart0` | = `UsbCdc` |
-| `UsbCdc` | USB serial port next to the adapter; lets the board be flashed without BOOT+RESET | (not used) | `Serial`: USB serial port next to the adapter |
-| `Uart0` | `Serial0`, 115200 baud (GPIO43/44 on most S3 boards; needs a USB-serial adapter) | `Serial0`, 115200 baud; the USB-UART bridge of the dev board | `Serial1`, 115200 baud (GP0 transmit, GP1 receive; needs a USB-serial adapter) |
-| `None` | no output, no extra USB serial port | | |
-
-See [behaviour.md](behaviour.md) for what is printed.
+Logging is not part of the configuration: the sketch passes an output to `TWD_LOGGER.begin(Serial)` before `begin()`. See [logging.md](logging.md).
 
 ## Methods
 

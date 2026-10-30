@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include "tusb.h"
 
+#include "../../core/Logger.h"
+
 namespace twd {
 
 /**
@@ -46,10 +48,14 @@ class Esp32UsbTaskPin {
       if (eTaskGetState(h) != eBlocked) continue;
       vTaskSuspend(h);
       vTaskDelete(h);
-      xTaskCreatePinnedToCore(&Esp32UsbTaskPin::usbdTask, "usbd", 4096, nullptr, configMAX_PRIORITIES - 1, nullptr,
-                              s->core_);
+      if (xTaskCreatePinnedToCore(&Esp32UsbTaskPin::usbdTask, "usbd", 4096, nullptr, configMAX_PRIORITIES - 1, nullptr,
+                                  s->core_) != pdPASS) {
+        TWD_LOGGER.error("USB: could not restart the USB task on core %d; USB is dead", s->core_);
+        break;
+      }
       s->pinned_ = true;
     }
+    if (!s->pinned_) TWD_LOGGER.warning("USB: the USB task was not pinned to core %d; send stalls are more likely", s->core_);
     vTaskDelete(nullptr);
   }
 };

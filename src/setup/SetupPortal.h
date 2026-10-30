@@ -4,6 +4,8 @@
 #include <WebServer.h>
 #include <WiFi.h>
 
+#include "../core/Logger.h"
+
 namespace twd {
 
 /**
@@ -21,9 +23,6 @@ class SetupPortal {
   explicit SetupPortal(const char* network, const char* password = nullptr)
       : network_(network), apPassword_(password ? password : "") {}
 
-  /// Prints what the portal does (address, connected devices, requests) to `out`; nullptr switches it off.
-  void setLog(Print* out) { log_ = out; }
-
   /// Serves the form until a network is submitted and returns it. Blocks.
   void run(String& ssid, String& password) {
     submitted_ = false;
@@ -34,12 +33,12 @@ class SetupPortal {
     while (!submitted_) {
       dns_.processNextRequest();
       server_.handleClient();
-      if (log_ && millis() - lastReport > 2000) {  // report when the number of connected devices changes
+      if (TWD_LOGGER.enabled() && millis() - lastReport > 2000) {  // report when the number of connected devices changes
         lastReport = millis();
         int n = WiFi.softAPgetStationNum();
         if (n != stations) {
           stations = n;
-          log_->printf("[setup] %d device(s) connected to the setup network\n", n);
+          TWD_LOGGER.info("setup: %d device(s) connected to the setup network", n);
         }
       }
       delay(2);
@@ -57,7 +56,6 @@ class SetupPortal {
   String options_;  // <option> list of the networks found by the scan
   String ssid_, enteredPassword_;  // what the user submitted
   bool submitted_ = false;
-  Print* log_ = nullptr;
 
   static String escape(const String& s) {
     String out;
@@ -77,10 +75,14 @@ class SetupPortal {
     options_ = "";
     WiFi.mode(WIFI_STA);
     int n = WiFi.scanNetworks();
-    if (log_) log_->printf("[setup] scan found %d network(s)\n", n);
+    if (n < 0) {
+      TWD_LOGGER.error("setup: scan failed (%d), the network name must be typed in", n);
+      return;
+    }
+    TWD_LOGGER.info("setup: scan found %d network(s)", n);
     for (int i = 0; i < n; i++) {
       String name = WiFi.SSID(i);
-      if (log_) log_->printf("[setup]   '%s' channel %d, %d dBm\n", name.c_str(), (int)WiFi.channel(i), (int)WiFi.RSSI(i));
+      TWD_LOGGER.info("setup:   '%s' channel %d, %d dBm", name.c_str(), (int)WiFi.channel(i), (int)WiFi.RSSI(i));
       if (name.length()) options_ += "<option value=\"" + escape(name) + "\">";
     }
   }
@@ -91,23 +93,28 @@ class SetupPortal {
     // The Pico picks 192.168.4.1 or 192.168.42.1 depending on the state of the radio; fix it.
     WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
 #endif
-    if (apPassword_.length()) {
-      WiFi.softAP(network_.c_str(), apPassword_.c_str());
-    } else {
-      WiFi.softAP(network_.c_str());
+    bool ap = apPassword_.length() ? WiFi.softAP(network_.c_str(), apPassword_.c_str()) : WiFi.softAP(network_.c_str());
+    if (!ap) {
+      TWD_LOGGER.error("setup: could not open the setup network '%s'%s", network_.c_str(),
+                       apPassword_.length() && apPassword_.length() < 8 ? " (password shorter than 8 characters)" : "");
     }
-    dns_.start(53, "*", WiFi.softAPIP());
-    if (log_) log_->printf("[setup] setup network '%s' open, address %s\n", network_.c_str(), WiFi.softAPIP().toString().c_str());
+    if (!dns_.start(53, "*", WiFi.softAPIP())) {
+      TWD_LOGGER.error("setup: could not start the DNS server, the page does not open by itself");
+    }
+    TWD_LOGGER.info("setup: setup network '%s' open, address %s", network_.c_str(), WiFi.softAPIP().toString().c_str());
     server_.on("/", [this]() {
-      if (log_) log_->println("[setup] GET /");
+      TWD_LOGGER.debug("setup: GET /");
       sendForm();
     });
     server_.on("/save", HTTP_POST, [this]() {
-      if (log_) log_->println("[setup] POST /save");
+      TWD_LOGGER.debug("setup: POST /save");
       receive();
     });
     server_.onNotFound([this]() {  // connectivity checks of phones and laptops end up here
-      if (log_) log_->printf("[setup] %s %s%s -> redirect\n", server_.method() == HTTP_GET ? "GET" : "other", server_.hostHeader().c_str(), server_.uri().c_str());
+      if (TWD_LOGGER.enabled(twd::LoggerClass::LogLevel::Debug)) {
+        TWD_LOGGER.debug("setup: %s %s%s -> redirect", server_.method() == HTTP_GET ? "GET" : "other",
+                         server_.hostHeader().c_str(), server_.uri().c_str());
+      }
       server_.sendHeader("Location", String("http://") + WiFi.softAPIP().toString() + "/");
       server_.send(302, "text/plain", "");
     });
@@ -137,6 +144,7 @@ class SetupPortal {
   void receive() {
     ssid_ = server_.arg("ssid");
     if (ssid_.length() == 0) {
+      TWD_LOGGER.error("setup: form submitted without a network name");
       server_.send(400, "text/plain", "The network name is missing.");
       return;
     }

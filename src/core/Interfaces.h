@@ -6,48 +6,13 @@
  *   Host <--USB--> UsbTransport <--> L2Bridge <--> FrameLink <--WiFi--> access point
  *
  * Every MCU port provides implementations of UsbTransport, FrameLink and
- * Uplink (and optionally a Logger); the classes in core/ only depend on these
- * interfaces.
+ * Uplink; the classes in core/ only depend on these interfaces.
  */
-#include <stdarg.h>
 #include <stdint.h>
-#include <stdio.h>
 
-#ifndef TWD_PRINTF_FORMAT
-#define TWD_PRINTF_FORMAT(fmt, args) __attribute__((format(printf, fmt, args)))
-#endif
+#include "Logger.h"
 
 namespace twd {
-
-/**
- * @brief Printf-style logging sink.
- *
- * The base class discards everything, so components can always log without
- * checking whether logging is wanted. Ports derive from it to write somewhere
- * useful (e.g. a USB serial port) and override enabled() and write().
- */
-class Logger {
- public:
-  virtual ~Logger() = default;
-
-  /// Formats and writes one line; does nothing if the logger is not enabled.
-  void log(const char* fmt, ...) TWD_PRINTF_FORMAT(2, 3) {
-    if (!enabled()) return;
-    char buf[256];
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, ap);
-    va_end(ap);
-    write(buf);
-  }
-
-  /// True if log() output is written somewhere.
-  virtual bool enabled() { return false; }
-
- protected:
-  /// Writes one finished line; override in derived classes.
-  virtual void write(const char* line) { (void)line; }
-};
 
 /**
  * @brief Consumer of Ethernet frames.

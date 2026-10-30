@@ -52,9 +52,6 @@ class Rp2040UsbNcm : public UsbTransport {
     uint32_t rxDrops;   ///< frames from the host dropped (no buffer)
   };
 
-  /// Create the transport; nothing is started before begin().
-  explicit Rp2040UsbNcm(Logger& log) : log_(log) {}
-
   bool begin(const char* productName) override {
     instance() = this;
     product_ = productName;
@@ -63,7 +60,10 @@ class Rp2040UsbNcm : public UsbTransport {
     txPool_ = (Frame*)calloc(toHost_, sizeof(Frame));
     rxPool_ = (Frame*)calloc(fromHost_, sizeof(Frame));
     if (!txPool_ || !rxPool_) {
-      log_.log("not enough memory for %d + %d frame buffers", toHost_, fromHost_);
+      TWD_LOGGER.error("USB: not enough memory for %d + %d frame buffers", toHost_, fromHost_);
+      free(txPool_);
+      free(rxPool_);
+      txPool_ = rxPool_ = nullptr;
       return false;
     }
     queue_init(&txFreeQ_, sizeof(Frame*), toHost_);
@@ -82,7 +82,10 @@ class Rp2040UsbNcm : public UsbTransport {
     }
     worker_.user_data = this;
     worker_.do_work = &Rp2040UsbNcm::work;
-    async_context_add_when_pending_worker(__getEthernetContext(), &worker_);
+    if (!async_context_add_when_pending_worker(__getEthernetContext(), &worker_)) {
+      TWD_LOGGER.error("USB: could not add the worker to the async context");
+      return false;
+    }
 
     memcpy(tud_network_mac_address, hostMac_, 6);
     snprintf(macStr_, sizeof(macStr_), "%02X%02X%02X%02X%02X%02X", hostMac_[0], hostMac_[1], hostMac_[2], hostMac_[3],
@@ -94,6 +97,11 @@ class Rp2040UsbNcm : public UsbTransport {
     epNotif_ = USB.registerEndpointIn();
     strDesc_ = USB.registerString(product_.c_str());
     strMac_ = USB.registerString(macStr_);
+    if (!epIn_ || !epOut_ || !epNotif_) {
+      TWD_LOGGER.error("USB: no free endpoints for the network interface");
+      USB.connect();
+      return false;
+    }
     id_ = USB.registerInterface(2, &Rp2040UsbNcm::interfaceCb, this, TUD_CDC_NCM_DESC_LEN, 3, 0);
     USB.connect();
     return true;
@@ -187,7 +195,6 @@ class Rp2040UsbNcm : public UsbTransport {
     uint8_t data[kMaxFrame];
   };
 
-  Logger& log_;
   String product_;
   FrameReceiver* receiver_ = nullptr;
   uint8_t hostMac_[6] = {};

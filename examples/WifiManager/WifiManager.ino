@@ -16,8 +16,8 @@
 // button (Pico) within the first 3 seconds after a start. The network is also
 // forgotten when the board cannot join it within 60 seconds of a start.
 //
-// The USB adapter does not exist while the setup runs. See
-// docs/setup.md for the details and the settings.
+// The USB adapter does not exist while the setup runs. Messages go to Serial
+// (see docs/logging.md). See docs/setup.md for the details and the settings.
 #include "TinyWifiDongle.h"
 #include "TinyWifiDongleSetup.h"
 
@@ -25,6 +25,8 @@ TinyWifiDongle dongle;
 TinyWifiDongleSetup wifiSetup;
 
 void setup() {
+  Serial.begin(115200);
+  TWD_LOGGER.begin(Serial);
   wifiSetup.begin();  // blocks until the board knows which network to join
   dongle.begin(wifiSetup.ssid(), wifiSetup.password());
 }
