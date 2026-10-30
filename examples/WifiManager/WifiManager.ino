@@ -1,63 +1,36 @@
-// Share the ESP32-S3's WiFi with a PC over USB, with the WiFi credentials
-// entered in a browser instead of being hard-coded.
+// Share the board's WiFi with a PC over USB, with the WiFi credentials entered
+// in a browser instead of being hard-coded.
 //
-// Needs the library "WiFiManager" by tzapu (Library Manager).
-// Board: ESP32-S3, "USB Mode" = "USB-OTG (TinyUSB)", "USB CDC On Boot" = disabled.
+// Works on the ESP32-S3 / S2 and on the Raspberry Pi Pico W / Pico 2 W, and
+// needs no additional library. Boards: see the WifiDongle example.
 //
 // First start (nothing saved yet):
 //   1. The board opens the WiFi network "TinyWifiDongle-Setup".
 //   2. Connect a phone or laptop to it; the setup page opens by itself
-//      (otherwise browse to http://192.168.4.1).
+//      (otherwise browse to http://192.168.4.1 on the ESP32, http://192.168.42.1
+//      on the Pico).
 //   3. Pick your WiFi network, enter the password, save.
 // The credentials are stored in flash. At the next start the board joins your
 // network directly, and from then on the USB adapter is bridged to it.
 //
-// To forget the saved network: press the BOOT button within the first 3 seconds
-// after a start (do not hold it while resetting, that enters the bootloader).
+// To forget the saved network: press the BOOT button (ESP32) or the BOOTSEL
+// button (Pico) within the first 3 seconds after a start. The network is also
+// forgotten when the board cannot join it within 60 seconds of a start.
 //
-// The setup page needs the ESP32 to have an IP address, which the bridge itself
-// never has. That is why WiFiManager runs first and the dongle takes over the
-// WiFi radio afterwards. The USB adapter does not exist while the setup runs.
-#include <WiFiManager.h>
-
+// The USB adapter does not exist while the setup runs. See
+// docs/setup.md for the details and the settings.
 #include "TinyWifiDongle.h"
-
-static const char* kSetupNetwork = "TinyWifiDongle-Setup";
-static const int kForgetButton = 0;  // BOOT button of most ESP32-S3 boards
+#include "TinyWifiDongleSetup.h"
 
 TinyWifiDongle dongle;
-
-// True if the BOOT button is pressed during the first 3 seconds.
-static bool forgetRequested() {
-  pinMode(kForgetButton, INPUT_PULLUP);
-  uint32_t start = millis();
-  while (millis() - start < 3000) {
-    if (digitalRead(kForgetButton) == LOW) return true;
-    delay(10);
-  }
-  return false;
-}
+TinyWifiDongleSetup wifiSetup;
 
 void setup() {
-  WiFiManager wifiManager;
-  if (forgetRequested()) wifiManager.resetSettings();
-
-  // Joins the saved network, or opens the setup network and waits until
-  // someone has entered working credentials.
-  if (!wifiManager.autoConnect(kSetupNetwork)) {
-    ESP.restart();
-  }
-
-  // Take over the credentials, then hand the WiFi radio to the dongle.
-  String ssid = WiFi.SSID();
-  String password = WiFi.psk();
-  WiFi.disconnect(true);
-
-  if (!dongle.begin(ssid.c_str(), password.length() ? password.c_str() : nullptr)) {
-    while (true) delay(1000);
-  }
+  wifiSetup.begin();  // blocks until the board knows which network to join
+  dongle.begin(wifiSetup.ssid(), wifiSetup.password());
 }
 
 void loop() {
+  wifiSetup.update(dongle.isWifiConnected());
   delay(1000);
 }

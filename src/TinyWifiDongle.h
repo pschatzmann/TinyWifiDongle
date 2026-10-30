@@ -28,7 +28,7 @@
 #elif defined(ARDUINO_ARCH_RP2040)
 #include "ports/TinyWifiDonglePortRp2040.h"
 #else
-#error "TinyWifiDongle: unsupported architecture (supported: ESP32-S2/S3; planned: RP2040 W)"
+#error "TinyWifiDongle: unsupported architecture (supported: ESP32-S2/S3/P4, Raspberry Pi Pico W / Pico 2 W)"
 #endif
 
 /**

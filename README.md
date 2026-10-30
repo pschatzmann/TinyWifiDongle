@@ -7,10 +7,19 @@ A __header-only C++ Arduino library__ that turns a microcontroller into a __USB 
 
 - No driver needed on the PC: Linux, macOS and Windows 11 have a CDC-NCM driver built in
 - Ethernet frames are bridged unchanged between USB and WiFi, so the PC is a normal client of your WiFi network and gets its address from your router's DHCP server. The MCU itself has no IP address
-- About 600 KB/s (5 Mbit/s) in the tests with the ESP32-S3, whose USB is full speed (12 Mbit/s): fine for browsing and downloads, but much slower than a PC's own WiFi ([details](docs/status.md))
-- Log output on `Serial0`, or on a USB serial port next to the adapter that also lets you upload sketches without holding BOOT (ESP32-S2/S3)
-- Credentials can be hard-coded or entered in a browser with [WiFiManager](docs/examples.md)
-- Supported: ESP32-S3 / S2 ([status and known issue](docs/status.md)). ESP32-P4: compiles, WiFi side tested, USB side needs a board with a USB-OTG connector. Planned: RP2040 W
+- Speed is limited by the full-speed USB (12 Mbit/s) of these chips: about 600 KB/s on the ESP32-S3 and about 250 KB/s on the Pico 2 W in the tests. Fine for browsing and downloads, but much slower than a PC's own WiFi ([details](docs/status.md))
+- Messages go to a serial port: `Serial0` (UART) or a USB serial port next to the adapter that also lets you upload sketches without holding BOOT/BOOTSEL ([details](docs/behaviour.md))
+- Credentials can be hard-coded or entered in a browser on a setup page the board opens itself ([details](docs/setup.md)), with no additional library
+
+## Supported platforms
+
+| Platform | Arduino core | State |
+|---|---|---|
+| __ESP32-S3__, __ESP32-S2__ | arduino-esp32 3.x (tested 3.3.12) | works, tested on an ESP32-S3 |
+| __Raspberry Pi Pico 2 W__ (RP2350), __Pico W__ (RP2040) | arduino-pico (tested 6.3.1) | works, tested on a Pico 2 W; the Pico W is untested |
+| __ESP32-P4__ | arduino-esp32 3.x | compiles, WiFi side tested; the USB side needs a board with a USB-OTG connector |
+
+Not supported: the original ESP32, ESP32-C3/C6 and other chips without a USB device controller that can carry a network class, the Raspberry Pi Pico without WiFi, and the Arduino mbed cores. Details and test results are in [Status](docs/status.md).
 
 ### Example
 
@@ -26,15 +35,19 @@ void setup() {
 void loop() {}
 ```
 
-Select the board option __USB Mode: USB-OTG (TinyUSB)__ and connect the USB-OTG port of the board to the PC.
+Board settings (the board is then connected to the PC with its USB connector):
+
+- __ESP32-S2/S3:__ board option __USB Mode: USB-OTG (TinyUSB)__, connect the USB-OTG port
+- __Raspberry Pi Pico W / Pico 2 W:__ the default option __USB Stack: Pico SDK__, connect the USB connector of the board
 
 ## Documentation
 
 - [Examples](docs/examples.md)
+- [WiFi setup in a browser](docs/setup.md) (`TinyWifiDongleSetup`)
 - [Configuration](docs/configuration.md)
-- [How it behaves](docs/behaviour.md) (addresses, serial port, status line, stall watchdog)
-- [Host setup tips](docs/host-setup.md) (route priority, NetworkManager, Wake-on-LAN)
-- [Status](docs/status.md) and [Known issue: the USB stall](docs/known-issues.md)
+- [How it behaves](docs/behaviour.md) (addresses, log output, status line, stall watchdog)
+- [Host setup tips](docs/host-setup.md) (route priority, NetworkManager, MTU, reading the counters, Wake-on-LAN)
+- [Status](docs/status.md) (per platform, throughput) and [Known issues](docs/known-issues.md) (the ESP32 USB stall, the Pico)
 - [Architecture](docs/architecture.md) (classes, bridge rules, analysis of the USB stall)
 - Class documentation: run `doxygen Doxyfile`, the HTML is generated into `docs/html-out/html/`
 
@@ -51,10 +64,9 @@ I recommend to use git because you can easily update to the latest version just 
 
 Requirements:
 
-- ESP32 board package (arduino-esp32) 3.x, tested with 3.3.12. It must include the TinyUSB NCM class, which is on in the prebuilt libraries
-- Board option __USB Mode: USB-OTG (TinyUSB)__, with the USB-OTG port of the board connected to the PC
-- Include `TinyWifiDongle.h` from the sketch only, because the header defines the USB driver callbacks
-- For the WiFiManager example: the library [WiFiManager](https://github.com/tzapu/WiFiManager) by tzapu (Library Manager)
+- __ESP32:__ ESP32 board package (arduino-esp32) 3.x, tested with 3.3.12. It must include the TinyUSB NCM class, which is on in the prebuilt libraries. Board option __USB Mode: USB-OTG (TinyUSB)__, with the USB-OTG port of the board connected to the PC
+- __Raspberry Pi Pico W / Pico 2 W:__ the arduino-pico core (Raspberry Pi Pico/RP2040/RP2350), tested with 6.3.1, board "Raspberry Pi Pico W" or "Raspberry Pi Pico 2W" with the default option __USB Stack: Pico SDK__. The board's single USB connector carries the adapter
+- Include `TinyWifiDongle.h` from the sketch only, because the header defines the USB driver callbacks (both platforms)
 
 Host support for CDC-NCM: Linux and macOS native, Windows 11 native (Windows 10 needs a driver).
 

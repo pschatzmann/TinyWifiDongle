@@ -12,8 +12,10 @@ enum class LogTarget {
   /// A USB serial port (CDC) next to the network adapter. It also lets the
   /// board be flashed without BOOT+RESET (ESP32-S2/S3).
   UsbCdc,
-  /// Hardware serial port UART0 ("Serial0", 115200 baud), e.g. the USB-UART
-  /// bridge of a dev board. Keeps the USB connection free of any serial port.
+  /// Hardware serial port UART0 (115200 baud): "Serial0" on the ESP32, "Serial1"
+  /// (GP0/GP1) on the Raspberry Pi Pico. Use it with the USB-UART bridge of a
+  /// dev board or an external adapter. Keeps the USB connection free of any
+  /// serial port.
   Uart0,
 };
 
@@ -56,6 +58,20 @@ struct TinyWifiDongleConfig {
   /// interrupt that make the send path stall under load. Keep this on unless
   /// you start the USB stack yourself (needs manageUsb).
   bool pinUsbTask = true;
+
+  /// Raspberry Pi Pico only: number of frame buffers (about 1.5 KB each) for
+  /// frames on their way to the host. 0 = the default of the chip: 48 on the
+  /// RP2350 (Pico 2 W), 24 on the RP2040 (Pico W). More buffers absorb bursts
+  /// of traffic, so fewer frames are dropped (a dropped frame slows a download
+  /// down), at the price of RAM. Ignored on the ESP32.
+  uint8_t framesToHost = 0;
+
+  /// Raspberry Pi Pico only: number of frame buffers for frames coming from the
+  /// host (mostly acknowledgements). 0 = the default of the chip: 16 on the
+  /// RP2350, 8 on the RP2040. The two directions have separate pools, so a
+  /// burst towards the host cannot take the buffers that the host's
+  /// acknowledgements need. Ignored on the ESP32.
+  uint8_t framesFromHost = 0;
 
   /// Largest Ethernet frame the USB adapter announces to the host (the host
   /// derives its MTU from it).
