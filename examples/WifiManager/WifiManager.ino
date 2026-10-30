@@ -17,7 +17,7 @@
 // forgotten when the board cannot join it within 60 seconds of a start.
 //
 // The USB adapter does not exist while the setup runs. Messages go to Serial
-// (see docs/logging.md). See docs/setup.md for the details and the settings.
+// (see the wiki page Logging). See the wiki page Setup for the details and the settings.
 #include "TinyWifiDongle.h"
 #include "TinyWifiDongleSetup.h"
 

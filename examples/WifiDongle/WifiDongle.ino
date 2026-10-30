@@ -11,8 +11,8 @@
 // 192.168.1.x) like any other WiFi client; the board itself has no IP address.
 //
 // Messages go to Serial: UART0 on the ESP32-S3 / S2, the USB serial port on
-// the Pico. Remove TWD_LOGGER.begin() for no output. See docs/logging.md and
-// docs/configuration.md for the options.
+// the Pico. Remove TWD_LOGGER.begin() for no output. See the wiki page Logging and
+// Configuration for the options.
 #include "TinyWifiDongle.h"
 
 TinyWifiDongle dongle;

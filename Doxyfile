@@ -1,8 +1,8 @@
 PROJECT_NAME           = "TinyWifiDongle"
 PROJECT_BRIEF          = "Header-only USB WiFi dongle for Arduino"
 PROJECT_NUMBER         = 0.1.0
-OUTPUT_DIRECTORY       = docs/html-out
-INPUT                  = src README.md docs
+OUTPUT_DIRECTORY       = html-out
+INPUT                  = src README.md
 USE_MDFILE_AS_MAINPAGE = README.md
 FILE_PATTERNS          = *.h *.md
 RECURSIVE              = YES

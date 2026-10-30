@@ -14,7 +14,7 @@ namespace twd {
  * ESP32-S2/S3 (0.21.0) has races between that task and the interrupt when
  * they run on different cores: a bulk IN transfer can lose its "TX FIFO empty"
  * interrupt and never complete, which stalls the network send path (see
- * docs/architecture.md). This class waits until the core's task is idle,
+ * the wiki page Architecture). This class waits until the core's task is idle,
  * deletes it and starts an identical one (`for (;;) tud_task();`) pinned to
  * `core`, which should be the core that started the USB stack, because the
  * USB interrupt is allocated on that core.

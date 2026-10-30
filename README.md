@@ -7,9 +7,9 @@ A __header-only C++ Arduino library__ that turns a microcontroller into a __USB 
 
 - No driver needed on the PC: Linux, macOS and Windows 11 have a CDC-NCM driver built in
 - Ethernet frames are bridged unchanged between USB and WiFi, so the PC is a normal client of your WiFi network and gets its address from your router's DHCP server. The MCU itself has no IP address
-- Speed is limited by the full-speed USB (12 Mbit/s) of these chips: about 600 KB/s on the ESP32-S3 and about 250 KB/s on the Pico 2 W in the tests. Fine for browsing and downloads, but much slower than a PC's own WiFi ([details](docs/status.md))
-- Messages go to any `Print` the sketch passes to `TWD_LOGGER`, e.g. a UART or a USB serial port ([details](docs/logging.md))
-- Credentials can be hard-coded or entered in a browser on a setup page the board opens itself ([details](docs/setup.md)), with no additional library
+- Speed is limited by the full-speed USB (12 Mbit/s) of these chips: about 600 KB/s on the ESP32-S3 and about 250 KB/s on the Pico 2 W in the tests. Fine for browsing and downloads, but much slower than a PC's own WiFi ([details](https://github.com/pschatzmann/TinyWifiDongle/wiki/Status))
+- Messages go to any `Print` the sketch passes to `TWD_LOGGER`, e.g. a UART or a USB serial port ([details](https://github.com/pschatzmann/TinyWifiDongle/wiki/Logging))
+- Credentials can be hard-coded or entered in a browser on a setup page the board opens itself ([details](https://github.com/pschatzmann/TinyWifiDongle/wiki/Setup)), with no additional library
 
 ## Supported platforms
 
@@ -19,7 +19,7 @@ A __header-only C++ Arduino library__ that turns a microcontroller into a __USB 
 | __Raspberry Pi Pico 2 W__ (RP2350), __Pico W__ (RP2040) | arduino-pico (tested 6.3.1) | works, tested on a Pico 2 W; the Pico W is untested |
 | __ESP32-P4__ | arduino-esp32 3.x | compiles, WiFi side tested; the USB side needs a board with a USB-OTG connector |
 
-Not supported: the original ESP32, ESP32-C3/C6 and other chips without a USB device controller that can carry a network class, the Raspberry Pi Pico without WiFi, and the Arduino mbed cores. Details and test results are in [Status](docs/status.md).
+Not supported: the original ESP32, ESP32-C3/C6 and other chips without a USB device controller that can carry a network class, the Raspberry Pi Pico without WiFi, and the Arduino mbed cores. Details and test results are in [Status](https://github.com/pschatzmann/TinyWifiDongle/wiki/Status).
 
 ### Example
 
@@ -42,15 +42,15 @@ Board settings (the board is then connected to the PC with its USB connector):
 
 ## Documentation
 
-- [Examples](docs/examples.md)
-- [WiFi setup in a browser](docs/setup.md) (`TinyWifiDongleSetup`)
-- [Configuration](docs/configuration.md)
-- [Logging](docs/logging.md) (`TWD_LOGGER`: output, log levels)
-- [How it behaves](docs/behaviour.md) (addresses, status line, stall watchdog)
-- [Host setup tips](docs/host-setup.md) (route priority, NetworkManager, MTU, reading the counters, Wake-on-LAN)
-- [Status](docs/status.md) (per platform, throughput) and [Known issues](docs/known-issues.md) (the ESP32 USB stall, the Pico)
-- [Architecture](docs/architecture.md) (classes, bridge rules, analysis of the USB stall)
-- Class documentation: run `doxygen Doxyfile`, the HTML is generated into `docs/html-out/html/`
+- [Examples](https://github.com/pschatzmann/TinyWifiDongle/wiki/Examples)
+- [WiFi setup in a browser](https://github.com/pschatzmann/TinyWifiDongle/wiki/Setup) (`TinyWifiDongleSetup`)
+- [Configuration](https://github.com/pschatzmann/TinyWifiDongle/wiki/Configuration)
+- [Logging](https://github.com/pschatzmann/TinyWifiDongle/wiki/Logging) (`TWD_LOGGER`: output, log levels)
+- [How it behaves](https://github.com/pschatzmann/TinyWifiDongle/wiki/Behaviour) (addresses, status line, stall watchdog)
+- [Host setup tips](https://github.com/pschatzmann/TinyWifiDongle/wiki/Host-Setup) (route priority, NetworkManager, MTU, reading the counters, Wake-on-LAN)
+- [Status](https://github.com/pschatzmann/TinyWifiDongle/wiki/Status) (per platform, throughput) and [Known issues](https://github.com/pschatzmann/TinyWifiDongle/wiki/Known-Issues) (the ESP32 USB stall, the Pico)
+- [Architecture](https://github.com/pschatzmann/TinyWifiDongle/wiki/Architecture) (classes, bridge rules, analysis of the USB stall)
+- Class documentation: run `doxygen Doxyfile`, the HTML is generated into `html-out/html/`
 
 ## Installation in Arduino
 
