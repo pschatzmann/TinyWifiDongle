@@ -41,6 +41,9 @@ class Rp2040WifiFrameLink : public Uplink, public FrameLink {
   bool begin(const char* ssid, const char* password) override {
     instance() = this;
     macAddress();  // starts the chip if that has not happened yet
+    // The core's begin() starts an access point when it finds the mode WIFI_AP, which a previous
+    // setup page can leave behind (WiFi.mode(WIFI_OFF) does not reset it), so ask for the station.
+    WiFi.mode(WIFI_STA);
     if (password) {
       WiFi.beginNoBlock(ssid, password);
     } else {

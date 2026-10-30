@@ -7,8 +7,7 @@
 // First start (nothing saved yet):
 //   1. The board opens the WiFi network "TinyWifiDongle-Setup".
 //   2. Connect a phone or laptop to it; the setup page opens by itself
-//      (otherwise browse to http://192.168.4.1 on the ESP32, http://192.168.42.1
-//      on the Pico).
+//      (otherwise browse to http://192.168.4.1).
 //   3. Pick your WiFi network, enter the password, save.
 // The credentials are stored in flash. At the next start the board joins your
 // network directly, and from then on the USB adapter is bridged to it.
@@ -31,6 +30,7 @@ void setup() {
 }
 
 void loop() {
-  wifiSetup.update(dongle.isWifiConnected());
-  delay(1000);
+  bool connected = dongle.isWifiConnected();
+  wifiSetup.update(connected);
+  delay(connected ? 1000 : 100);  // nothing to do once connected; look more often while joining
 }

@@ -15,20 +15,21 @@ void setup() {
 }
 
 void loop() {
-  wifiSetup.update(dongle.isWifiConnected());
-  delay(1000);
+  bool connected = dongle.isWifiConnected();
+  wifiSetup.update(connected);
+  delay(connected ? 1000 : 100);  // nothing to do once connected; look more often while joining
 }
 ```
 
-__Status:__ builds for the ESP32-S3 and the Pico 2 W; the setup page itself has not yet been run on a board.
+__Status:__ run on a Pico 2 W (setup page, saving, joining, and joining again after a replug); builds for the ESP32-S3, where the setup page itself has not yet been run on a board.
 
 ## How it works
 1. `begin()` reads the network saved in flash.
-2. If there is none, the board scans for networks, then opens a WiFi network of its own, the __setup network__ (`TinyWifiDongle-Setup`, open by default). Every DNS query is answered with the board's address, so a phone or laptop that joins the setup network opens the page by itself. Otherwise browse to `http://192.168.4.1` (ESP32) or `http://192.168.42.1` (Pico).
+2. If there is none, the board scans for networks, then opens a WiFi network of its own, the __setup network__ (`TinyWifiDongle-Setup`, open by default). Every DNS query is answered with the board's address, so a phone or laptop that joins the setup network opens the page by itself. Otherwise browse to `http://192.168.4.1` (the address of the board on the setup network, on both platforms). Some phones, Android in particular, do not offer to "sign in" to a network without internet and send browser traffic over mobile data instead; then switch mobile data off while doing the setup and open the address by hand. `setLog(&Serial)` prints the address and every request, which shows what the phone does.
 3. The page offers the networks found by the scan (the name can also be typed) and asks for the password. After saving, the setup network closes and `begin()` returns.
 4. The choice is kept in flash (the EEPROM emulation of the core, no filesystem partition needed), so the next start joins directly.
 
-The setup page needs the board to have an IP address, which the bridge of `TinyWifiDongle` never has. So the setup runs first, and the dongle takes over the WiFi chip afterwards. The USB adapter does not exist while the setup runs.
+The setup page needs the board to have an IP address, which the bridge of `TinyWifiDongle` never has. So the setup runs first, and the dongle takes over the WiFi chip afterwards. The USB adapter does not exist while the setup runs, and neither does a USB serial port: the board is invisible to the PC. To upload a new sketch to a board that is in the setup, put it into its bootloader by hand: hold BOOTSEL while plugging in the USB cable (Pico), or use BOOT+RESET (ESP32).
 
 ## Forgetting the network
 - Press the BOOT button (ESP32) or the BOOTSEL button (Pico) within the first 3 seconds after a start.

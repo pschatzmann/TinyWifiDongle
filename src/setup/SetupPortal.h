@@ -21,14 +21,27 @@ class SetupPortal {
   explicit SetupPortal(const char* network, const char* password = nullptr)
       : network_(network), apPassword_(password ? password : "") {}
 
+  /// Prints what the portal does (address, connected devices, requests) to `out`; nullptr switches it off.
+  void setLog(Print* out) { log_ = out; }
+
   /// Serves the form until a network is submitted and returns it. Blocks.
   void run(String& ssid, String& password) {
     submitted_ = false;
     scan();
     start();
+    uint32_t lastReport = 0;
+    int stations = -1;
     while (!submitted_) {
       dns_.processNextRequest();
       server_.handleClient();
+      if (log_ && millis() - lastReport > 2000) {  // report when the number of connected devices changes
+        lastReport = millis();
+        int n = WiFi.softAPgetStationNum();
+        if (n != stations) {
+          stations = n;
+          log_->printf("[setup] %d device(s) connected to the setup network\n", n);
+        }
+      }
       delay(2);
     }
     delay(1500);  // let the answer reach the browser
@@ -44,6 +57,7 @@ class SetupPortal {
   String options_;  // <option> list of the networks found by the scan
   String ssid_, enteredPassword_;  // what the user submitted
   bool submitted_ = false;
+  Print* log_ = nullptr;
 
   static String escape(const String& s) {
     String out;
@@ -63,23 +77,37 @@ class SetupPortal {
     options_ = "";
     WiFi.mode(WIFI_STA);
     int n = WiFi.scanNetworks();
+    if (log_) log_->printf("[setup] scan found %d network(s)\n", n);
     for (int i = 0; i < n; i++) {
       String name = WiFi.SSID(i);
+      if (log_) log_->printf("[setup]   '%s' channel %d, %d dBm\n", name.c_str(), (int)WiFi.channel(i), (int)WiFi.RSSI(i));
       if (name.length()) options_ += "<option value=\"" + escape(name) + "\">";
     }
   }
 
   void start() {
     WiFi.mode(WIFI_AP);
+#if !defined(ESP32)
+    // The Pico picks 192.168.4.1 or 192.168.42.1 depending on the state of the radio; fix it.
+    WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+#endif
     if (apPassword_.length()) {
       WiFi.softAP(network_.c_str(), apPassword_.c_str());
     } else {
       WiFi.softAP(network_.c_str());
     }
     dns_.start(53, "*", WiFi.softAPIP());
-    server_.on("/", [this]() { sendForm(); });
-    server_.on("/save", HTTP_POST, [this]() { receive(); });
+    if (log_) log_->printf("[setup] setup network '%s' open, address %s\n", network_.c_str(), WiFi.softAPIP().toString().c_str());
+    server_.on("/", [this]() {
+      if (log_) log_->println("[setup] GET /");
+      sendForm();
+    });
+    server_.on("/save", HTTP_POST, [this]() {
+      if (log_) log_->println("[setup] POST /save");
+      receive();
+    });
     server_.onNotFound([this]() {  // connectivity checks of phones and laptops end up here
+      if (log_) log_->printf("[setup] %s %s%s -> redirect\n", server_.method() == HTTP_GET ? "GET" : "other", server_.hostHeader().c_str(), server_.uri().c_str());
       server_.sendHeader("Location", String("http://") + WiFi.softAPIP().toString() + "/");
       server_.send(302, "text/plain", "");
     });
@@ -90,7 +118,9 @@ class SetupPortal {
     server_.stop();
     dns_.stop();
     WiFi.softAPdisconnect(true);
-    WiFi.mode(WIFI_OFF);
+    // Not WIFI_OFF: on the Raspberry Pi Pico that leaves the core in WIFI_AP, in which its begin() starts an
+    // access point instead of joining a network.
+    WiFi.mode(WIFI_STA);
   }
 
   void sendForm() {

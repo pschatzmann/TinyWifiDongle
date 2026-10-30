@@ -30,7 +30,11 @@
  *   wifiSetup.begin();
  *   dongle.begin(wifiSetup.ssid(), wifiSetup.password());
  * }
- * void loop() { wifiSetup.update(dongle.isWifiConnected()); }
+ * void loop() {
+ *   bool connected = dongle.isWifiConnected();
+ *   wifiSetup.update(connected);
+ *   delay(connected ? 1000 : 100);
+ * }
  * @endcode
  */
 class TinyWifiDongleSetup {
@@ -44,6 +48,9 @@ class TinyWifiDongleSetup {
 
   /// How long a start may take to join the network before the saved network is forgotten and the setup opens again; 0 = never. Default 60000.
   void setJoinTimeout(uint32_t ms) { joinTimeoutMs_ = ms; }
+
+  /// Prints what the setup does (the address of the setup page, connected devices, requests) to `out`, e.g. `Serial`; nullptr switches it off.
+  void setLog(Print* out) { portal_.setLog(out); }
 
   /// Loads the saved network, or opens the setup and blocks until the user has entered one.
   void begin() {

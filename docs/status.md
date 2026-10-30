@@ -43,4 +43,4 @@ Port for the arduino-pico core (`rp2040:rp2040`, tested with 6.3.1) with the def
 The speed is about half of the ESP32-S3's. Like the ESP32-S3, the RP2350 has only a full-speed USB controller (12 Mbit/s). Dropped frames slow TCP down, so more buffers for frames to the host (`framesToHost`) may help; other candidates are the frame handling in the async context, the small NTB buffers of the core's USB configuration and the WiFi chip's SPI link. These are not measured.
 
 ## WiFi setup page
-`TinyWifiDongleSetup` (see [setup.md](setup.md)) builds for the ESP32-S3 and the Pico 2 W. The setup page itself, meaning the setup network, the web form and saving the credentials, has not yet been run on a board.
+`TinyWifiDongleSetup` (see [setup.md](setup.md)) builds for the ESP32-S3 and the Pico 2 W. On a Pico 2 W the whole flow was run: setup network, web form, saving, joining the network (the adapter received an address from the router) and joining again after a replug. On the ESP32-S3 the setup page has not yet been run on a board.
