@@ -50,7 +50,7 @@ Board settings (the board is then connected to the PC with its USB connector):
 - [Host setup tips](https://github.com/pschatzmann/TinyWifiDongle/wiki/Host-Setup) (route priority, NetworkManager, MTU, reading the counters, Wake-on-LAN)
 - [Status](https://github.com/pschatzmann/TinyWifiDongle/wiki/Status) (per platform, throughput) and [Known issues](https://github.com/pschatzmann/TinyWifiDongle/wiki/Known-Issues) (the ESP32 USB stall, the Pico)
 - [Architecture](https://github.com/pschatzmann/TinyWifiDongle/wiki/Architecture) (classes, bridge rules, analysis of the USB stall)
-- Class documentation: run `doxygen Doxyfile`, the HTML is generated into `html-out/html/`
+- [Class documentation](https://pschatzmann.github.io/TinyWifiDongle/annotated.html) (Doxygen, generated from the sources; to build it yourself run `doxygen Doxyfile`, the HTML goes to `html-out/html/`)
 
 ## Installation in Arduino
 
