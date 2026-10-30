@@ -1,0 +1,22 @@
+PROJECT_NAME           = "TinyWifiDongle"
+PROJECT_BRIEF          = "Header-only USB WiFi dongle for Arduino"
+PROJECT_NUMBER         = 0.1.0
+OUTPUT_DIRECTORY       = docs/html-out
+INPUT                  = src README.md docs
+USE_MDFILE_AS_MAINPAGE = README.md
+FILE_PATTERNS          = *.h *.md
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+OPTIMIZE_OUTPUT_FOR_C  = NO
+MARKDOWN_SUPPORT       = YES
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+SOURCE_BROWSER         = YES
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = ESP32=1 "TWD_PRINTF_FORMAT(x,y)="
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
